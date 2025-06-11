@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Bloques;
+use App\Models\Bloque;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Registros extends Model
+class Registro extends Model
 {
     use HasFactory;
 
     protected $table = 'registros';
-    protected $primaryKey = 'id_pieza';
-    public $incrementing = false;
+    protected $primaryKey = 'id_registro';
+    public $incrementing = true;
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -26,9 +26,16 @@ class Registros extends Model
         'registrado_por'
     ];
 
+    /**
+     * Un registro pertenece a un bloque
+     */
     public function bloque()
     {
-        return $this->belongsTo(Bloques::class, 'id_bloque', 'id_bloque');
+        return $this->belongsTo(Bloque::class, 'id_bloque', 'id_bloque');
     }
 
+    public function pieza()
+    {
+        return $this->belongsTo(Pieza::class, 'id_pieza', 'id_pieza');
+    }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Piezas extends Model
+class Pieza extends Model
 {
     use HasFactory;
 
@@ -26,11 +26,17 @@ class Piezas extends Model
         'registrado_por',
     ];
 
+    /**
+     * Una pieza pertenece a un proyecto
+     */
     public function proyecto()
     {
         return $this->belongsTo(Proyecto::class, 'id_proyecto', 'id_proyecto');
     }
 
+    /**
+     * Una pieza pertenece a un bloque
+     */
     public function bloque()
     {
         return $this->belongsTo(Bloque::class, 'id_bloque', 'id_bloque');

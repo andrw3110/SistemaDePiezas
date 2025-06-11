@@ -1,61 +1,60 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProyectoController;
+use App\Http\Controllers\BloqueController;
+use App\Http\Controllers\RegistroController;
+use App\Http\Controllers\PiezaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-use App\Http\Controllers\ProyectosController;
-use App\Http\Controllers\BloquesController;
-use App\Http\Controllers\RegistrosController;
-use App\Http\Controllers\PiezasController;
-
-
-// Redirigir raíz al login directamente
+// 🔒 Redirige a login si acceden a la raíz
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// Dashboard (solo para usuarios autenticados)
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// 📊 Ruta al Dashboard principal (protegido)
+Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Rutas protegidas por autenticación
+// 👤 Rutas para editar perfil (protegidas)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 });
 
-// Rutas de autenticación (login, register, etc.)
+// 📦 CRUD de Proyectos (protegido)
+Route::middleware('auth')->prefix('proyectos')->name('proyectos.')->group(function () {
+    Route::get('/', [ProyectoController::class, 'index'])->name('index');
+    Route::post('/', [ProyectoController::class, 'store'])->name('store');
+    Route::put('/{proyecto}', [ProyectoController::class, 'update'])->name('update');
+    Route::delete('/{proyecto}', [ProyectoController::class, 'destroy'])->name('destroy');
+});
+
+// 🧱 CRUD de Bloques (protegido)
+Route::middleware('auth')->prefix('bloques')->name('bloques.')->group(function () {
+    Route::get('/', [BloqueController::class, 'index'])->name('index');
+    Route::post('/', [BloqueController::class, 'store'])->name('store');
+    Route::put('/{bloque}', [BloqueController::class, 'update'])->name('update');
+    Route::delete('/{bloque}', [BloqueController::class, 'destroy'])->name('destroy');
+});
+
+// 📝 CRUD de Registros (protegido)
+Route::middleware('auth')->prefix('registros')->name('registros.')->group(function () {
+    Route::get('/', [RegistroController::class, 'index'])->name('index');
+    Route::post('/', [RegistroController::class, 'store'])->name('store');
+    Route::put('/{registro}', [RegistroController::class, 'update'])->name('update');
+    Route::delete('/{registro}', [RegistroController::class, 'destroy'])->name('destroy');
+});
+
+// ⚙️ CRUD de Piezas (protegido)
+Route::middleware('auth')->prefix('piezas')->name('piezas.')->group(function () {
+    Route::get('/', [PiezaController::class, 'index'])->name('index');
+    Route::post('/', [PiezaController::class, 'store'])->name('store');
+    Route::put('/{pieza}', [PiezaController::class, 'update'])->name('update');
+    Route::delete('/{pieza}', [PiezaController::class, 'destroy'])->name('destroy');
+});
+
+// 🔐 Rutas de autenticación generadas por Breeze/Fortify
 require __DIR__.'/auth.php';
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/proyectos', [ProyectosController::class, 'index'])->name('proyectos.index');
-    Route::post('/proyectos', [ProyectosController::class, 'store'])->name('proyectos.store');
-    Route::put('/proyectos/{proyecto}', [ProyectosController::class, 'update'])->name('proyectos.update');
-    Route::delete('/proyectos/{proyecto}', [ProyectosController::class, 'destroy'])->name('proyectos.destroy');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/bloques', [BloquesController::class, 'index'])->name('bloques.index');
-    Route::post('/bloques', [BloquesController::class, 'store'])->name('bloques.store');
-    Route::put('/bloques/{bloque}', [BloquesController::class, 'update'])->name('bloques.update');
-    Route::delete('/bloques/{bloque}', [BloquesController::class, 'destroy'])->name('bloques.destroy');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/registros', [RegistrosController::class, 'index'])->name('registros.index');
-    Route::post('/registros', [RegistrosController::class, 'store'])->name('registros.store');
-    Route::put('/registros/{registro}', [RegistrosController::class, 'update'])->name('registros.update');
-    Route::delete('/registros/{registro}', [RegistrosController::class, 'destroy'])->name('registros.destroy');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/piezas', [PiezasController::class, 'index'])->name('piezas.index');
-    Route::post('/piezas', [PiezasController::class, 'store'])->name('piezas.store');
-    Route::put('/piezas/{pieza}', [PiezasController::class, 'update'])->name('piezas.update');
-    Route::delete('/piezas/{pieza}', [PiezasController::class, 'destroy'])->name('piezas.destroy');
-});

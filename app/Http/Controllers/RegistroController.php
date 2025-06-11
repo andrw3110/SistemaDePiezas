@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Registros;
-use App\Models\Bloques;
-use App\Http\Controllers\Controller;
+use App\Models\Registro;
+use App\Models\Bloque;
+use App\Models\Pieza;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str; 
-use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
 
-
-
-class RegistrosController extends Controller
+class RegistroController extends Controller
 {
     public function index()
     {
         $usuarioNombre = Auth::user()->name; 
-        $registros = Registros::with('bloque')->get();
-        $bloques = Bloques::all();
+        $registros = Registro::with('bloque')->get();
+        $bloques = Bloque::all();
+        $piezas = Pieza::all();
 
         return Inertia::render('RegistrosComponent', [
             'registros' => $registros,
             'bloques' => $bloques,
             'usuarioNombre' => $usuarioNombre,
+            'piezas' => $piezas
         ]);
     }
 
@@ -40,13 +41,8 @@ class RegistrosController extends Controller
             'registrado_por' => 'nullable|string|max:50',
         ]);
 
-        $idPieza = strtoupper(Str::random(10));
-        while (Registros::where('id_pieza', $idPieza)->exists()) {
-            $idPieza = strtoupper(Str::random(10));
-        }
-
-        Registros::create([
-            'id_pieza' => $idPieza,
+        Registro::create([
+            'id_pieza' => $request->input('id_pieza'),
             'pieza' => $request->input('pieza'),
             'peso_teorico' => $request->input('peso_teorico'),
             'peso_real' => $request->input('peso_real'),
@@ -59,7 +55,7 @@ class RegistrosController extends Controller
         return redirect()->route('registros.index')->with('success', 'Registro creado correctamente.');
     }
 
-    public function update(Request $request, Registros $registro)
+    public function update(Request $request, Registro $registro)
     {
         $request->validate([
             'pieza' => 'required|string|max:10',
@@ -84,8 +80,9 @@ class RegistrosController extends Controller
         return redirect()->route('registros.index')->with('success', 'Registro actualizado correctamente.');
     }
 
-    public function destroy(Registros $registro)
+    public function destroy($id)
     {
+        $registro = Registro::findOrFail($id);
         $registro->delete();
 
         return redirect()->route('registros.index')->with('success', 'Registro eliminado correctamente.');

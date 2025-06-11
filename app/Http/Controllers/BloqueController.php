@@ -2,26 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bloques;
-use App\Models\Proyectos;
-use App\Http\Controllers\Controller;
+use App\Models\Bloque;
+use App\Models\Proyecto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str; 
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
 
-class BloquesController extends Controller
+class BloqueController extends Controller
 {
+    /**
+     * Muestra la vista principal de bloques con sus proyectos relacionados.
+     */
     public function index()
     {
-        $bloques = Bloques::with('proyecto')->get();
+        $bloques = Bloque::with('proyecto')->get();
 
         return Inertia::render('BloqueComponent', [
             'bloques' => $bloques,
-            'proyectos' => Proyectos::all(),
+            'proyectos' => Proyecto::all(),
         ]);
     }
 
+    /**
+     * Almacena un nuevo bloque en la base de datos.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -30,11 +36,11 @@ class BloquesController extends Controller
         ]);
 
         $idBloque = strtoupper(Str::random(10));
-        while (Bloques::where('id_bloque', $idBloque)->exists()) {
+        while (Bloque::where('id_bloque', $idBloque)->exists()) {
             $idBloque = strtoupper(Str::random(10));
         }
 
-        Bloques::create([
+        Bloque::create([
             'id_bloque' => $idBloque,
             'nombre_bloque' => $request->input('nombre_bloque'),
             'id_proyecto' => $request->input('id_proyecto'),
@@ -43,7 +49,10 @@ class BloquesController extends Controller
         return redirect()->route('bloques.index')->with('success', 'Bloque creado correctamente.');
     }
 
-    public function update(Request $request, Bloques $bloque)
+    /**
+     * Actualiza los datos de un bloque existente.
+     */
+    public function update(Request $request, Bloque $bloque)
     {
         $request->validate([
             'nombre_bloque' => 'required|string|max:10',
@@ -58,10 +67,14 @@ class BloquesController extends Controller
         return redirect()->route('bloques.index')->with('success', 'Bloque actualizado correctamente.');
     }
 
-    public function destroy(Bloques $bloque)
+    /**
+     * Elimina un bloque específico.
+     */
+    public function destroy(Bloque $bloque)
     {
         $bloque->delete();
 
         return redirect()->route('bloques.index')->with('success', 'Bloque eliminado correctamente.');
     }
 }
+
