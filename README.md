@@ -1,66 +1,78 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Prueba Técnica de Desarrollo Web
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto es una aplicación web desarrollada como parte de una prueba técnica para evaluar habilidades en desarrollo full-stack con **Laravel 10**, **Vue.js 3**, **Inertia.js** y **SQLite**. La aplicación permite gestionar el registro y visualización de piezas relacionadas con proyectos y bloques.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🎯 Objetivo
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Visualizar un listado con toda la información de las piezas registradas a "La Minucia", incluyendo su registro, validación, filtrado por estado y reportes.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ⚙️ Tecnologías utilizadas
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Back-end**: Laravel 10 + Eloquent ORM
+- **Front-end**: Vue.js 3 + Inertia.js
+- **Base de datos**: SQLite
+- **Autenticación**: Laravel Breeze / Jetstream (dependiendo de implementación)
+- **Estilo**: Bootstrap + diseño responsive (RA)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🧪 Funcionalidades implementadas
 
-## Laravel Sponsors
+### 🔐 Autenticación
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- ✅ Login básico de usuarios autorizados (RB)
+- ✅ Redirección al formulario si login es exitoso (RB)
+- ✅ Prevención de acceso directo a rutas protegidas (RA)
 
-### Premium Partners
+### 📋 Formulario de registro de piezas
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- ✅ Fecha y hora automática del sistema (RB)
+- ✅ Selección de proyecto (RB)
+- ✅ Selección anidada de bloque según proyecto (RB)
+- ✅ Selección de pieza filtrada por bloque y estado “Pendiente” (RA)
+- ✅ Visualización automática del peso teórico (RB)
+- ✅ Ingreso de peso real y validación numérica (RB)
+- ✅ Cálculo automático de diferencia entre peso teórico y real (RA)
+- ✅ Validaciones en el cliente (RA)
+- ✅ Persistencia de datos con validación del lado del servidor (RB + RA)
+- ✅ Responsive design para móviles y escritorio (RA)
 
-## Contributing
+### 📊 Reportes
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- 📌 Listado de piezas pendientes agrupadas por proyecto (RA)
+- 📌 Reporte gráfico de piezas pendientes y fabricadas por proyecto (RA)
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🗃️ Estructura de base de datos
 
-## Security Vulnerabilities
+Se utilizan al menos las siguientes tablas con relaciones:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. `usuarios`
+2. `proyectos`
+3. `bloques`
+4. `piezas`
+5. `registros` (almacena los datos ingresados desde el formulario)
 
-## License
+Cada tabla cuenta con su respectivo CRUD utilizando Eloquent y migraciones de Laravel. Se pueden haber añadido campos o tablas auxiliares justificadamente.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 🚀 Instalación y uso
+
+```bash
+git clone https://github.com/andrw3110/SistemaDePiezas
+cd tu_repositorio
+cp .env.example .env
+php artisan key:generate
+# Configurar .env para usar sqlite:
+touch database/database.sqlite
+# Asegúrate de tener DB_CONNECTION=sqlite en el .env
+php artisan migrate --seed
+npm install && npm run build
+php artisan serve
+
