@@ -21,4 +21,11 @@ class Proyecto extends Model
 
     // Campos que pueden asignarse masivamente
     protected $fillable = ['id_proyecto', 'nombre'];
+
+    // Relación con la tabla bloques
+   public function bloques()
+    {
+    return $this->hasMany(Bloque::class, 'id_proyecto', 'id_proyecto');
+    }
+
 }

@@ -12,7 +12,8 @@ const page = usePage()
 const showModal = ref(false)
 const isEdit = ref(false)
 const form = reactive({
-  id_proyecto: null,
+  id_proyecto: '',
+  original_id: '',
   nombre: ''
 })
 
@@ -22,7 +23,8 @@ watch(() => page.props.flash?.message, (message) => {
 
 function openCreateModal() {
   isEdit.value = false
-  form.id_proyecto = null
+  form.id_proyecto = ''
+  form.original_id = ''
   form.nombre = ''
   showModal.value = true
 }
@@ -30,24 +32,28 @@ function openCreateModal() {
 function openEditModal(proyecto) {
   isEdit.value = true
   form.id_proyecto = proyecto.id_proyecto
+  form.original_id = proyecto.id_proyecto
   form.nombre = proyecto.nombre
   showModal.value = true
 }
 
 function saveProyecto() {
-  const payload = { nombre: form.nombre }
+  const payload = {
+    id_proyecto: form.id_proyecto,
+    nombre: form.nombre
+  }
 
-  const method = isEdit.value ? 'put' : 'post'
-  const url = isEdit.value
-    ? `/proyectos/${form.id_proyecto}`
-    : '/proyectos'
-
-  router[method](url, payload, {
-    preserveScroll: true,
-    onSuccess: () => {
-      showModal.value = false
-    }
-  })
+  if (isEdit.value) {
+    router.put(`/proyectos/${form.original_id}`, payload, {
+      preserveScroll: true,
+      onSuccess: () => (showModal.value = false)
+    })
+  } else {
+    router.post('/proyectos', payload, {
+      preserveScroll: true,
+      onSuccess: () => (showModal.value = false)
+    })
+  }
 }
 
 function deleteProyecto(id) {
@@ -117,9 +123,9 @@ function deleteProyecto(id) {
           </tr>
         </tbody>
       </table>
+
     </div>
 
-    <!-- Modal -->
     <div
       v-if="showModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4"
@@ -144,6 +150,19 @@ function deleteProyecto(id) {
             />
           </div>
 
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              ID del Proyecto
+            </label>
+            <input
+              v-model="form.id_proyecto"
+              type="text"
+              maxlength="20"
+              required
+              class="w-full border border-amber-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            />
+          </div>
+
           <div class="flex justify-end space-x-2 pt-4">
             <button
               type="button"
@@ -162,7 +181,6 @@ function deleteProyecto(id) {
         </form>
       </div>
     </div>
+
   </AuthenticatedLayout>
 </template>
-
-
