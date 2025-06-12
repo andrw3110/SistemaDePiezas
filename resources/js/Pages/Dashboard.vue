@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue' // Importa 'computed' para propiedades reactivas
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, usePage } from '@inertiajs/vue3'
 
@@ -7,6 +8,40 @@ const { props } = usePage()
 
 const resumen = props.resumen
 const piezasRecientes = props.piezasRecientes
+
+// Calcular los totales y porcentajes para la gráfica de dona CSS
+const totalPiezas = computed(() => (resumen.piezas_fabricadas ?? 0) + (resumen.piezas_pendientes ?? 0));
+
+const fabricadoPorcentaje = computed(() => {
+    if (totalPiezas.value === 0) return 0;
+    return ((resumen.piezas_fabricadas ?? 0) / totalPiezas.value) * 100;
+});
+
+const pendientePorcentaje = computed(() => {
+    // Si el total es 0, o si fabricadoPorcentaje ya es 100 (y total es 0), el pendiente es 0
+    if (totalPiezas.value === 0) return 0;
+    // O puedes simplemente calcularlo como 100 - fabricadoPorcentaje para evitar posibles imprecisiones de coma flotante
+    return 100 - fabricadoPorcentaje.value; 
+    // return ((resumen.piezas_pendientes ?? 0) / totalPiezas.value) * 100; // Otra opción
+});
+
+// Generar el estilo de background para la gráfica de dona CSS usando conic-gradient
+const donutStyle = computed(() => {
+    // Define los colores usando una paleta que combine con ámbar pero sea distintiva para la gráfica
+    // Un verde para "Fabricado" y un naranja/rojo para "Pendiente"
+    const colorFabricado = '#2A9D8F'; // Un verde oscuro que contrasta
+    const colorPendiente = '#E76F51'; // Un naranja-rojizo que resalta el "pendiente"
+
+    // Calcula el punto de parada del gradiente para el porcentaje fabricado
+    const fabricadoStop = fabricadoPorcentaje.value;
+
+    return {
+        backgroundImage: `conic-gradient(
+            ${colorFabricado} 0% ${fabricadoStop}%,
+            ${colorPendiente} ${fabricadoStop}% 100%
+        )`
+    };
+});
 </script>
 
 <template>
@@ -14,58 +49,95 @@ const piezasRecientes = props.piezasRecientes
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-2xl text-[#264653] leading-tight">Panel Principal</h2>
+            <h2 class="font-semibold text-2xl text-amber-900 leading-tight">Panel Principal</h2>
         </template>
 
         <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Tarjetas resumen -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-[#E9C46A] text-[#264653] rounded-xl p-6 shadow-md">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="bg-amber-100 text-amber-900 rounded-xl p-6 shadow-md">
                     <h3 class="text-lg font-bold">Proyectos</h3>
                     <p class="text-3xl mt-2">{{ resumen.proyectos }}</p>
                 </div>
-                <div class="bg-[#F4A261] text-white rounded-xl p-6 shadow-md">
+                <div class="bg-amber-200 text-amber-900 rounded-xl p-6 shadow-md">
                     <h3 class="text-lg font-bold">Bloques</h3>
                     <p class="text-3xl mt-2">{{ resumen.bloques }}</p>
                 </div>
-                <div class="bg-[#2A9D8F] text-white rounded-xl p-6 shadow-md">
-                    <h3 class="text-lg font-bold">Piezas</h3>
+                <div class="bg-amber-300 text-amber-900 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-bold">Piezas Totales</h3>
                     <p class="text-3xl mt-2">{{ resumen.piezas }}</p>
+                </div>
+                <div class="bg-green-200 text-green-900 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-bold">Piezas Fabricadas</h3>
+                    <p class="text-3xl mt-2">{{ resumen.piezas_fabricadas ?? 0 }}</p>
+                </div>
+                <div class="bg-red-200 text-red-900 rounded-xl p-6 shadow-md">
+                    <h3 class="text-lg font-bold">Piezas Pendientes</h3>
+                    <p class="text-3xl mt-2">{{ resumen.piezas_pendientes ?? 0 }}</p>
                 </div>
             </div>
 
-            <!-- Tabla de piezas recientes -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <h3 class="text-xl font-semibold text-[#264653] px-6 pt-6">Últimas piezas registradas</h3>
-                <table class="min-w-full text-sm text-gray-800 mt-4">
-                    <thead class="bg-[#E9C46A] text-[#264653]">
-                        <tr>
-                            <th class="px-6 py-3 text-left">#</th>
-                            <th class="px-6 py-3 text-left">Pieza</th>
-                            <th class="px-6 py-3 text-left">Proyecto</th>
-                            <th class="px-6 py-3 text-left">Bloque</th>
-                            <th class="px-6 py-3 text-left">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr 
-                            v-for="(pieza, index) in piezasRecientes" 
-                            :key="pieza.id_pieza" 
-                            class="hover:bg-[#fdf6e3] border-b"
-                        >
-                            <td class="px-6 py-2">{{ index + 1 }}</td>
-                            <td class="px-6 py-2">{{ pieza.pieza }}</td>
-                            <td class="px-6 py-2">{{ pieza.proyecto?.nombre ?? 'Sin proyecto' }}</td>
-                            <td class="px-6 py-2">{{ pieza.bloque?.nombre_bloque ?? 'Sin bloque' }}</td>
-                            <td class="px-6 py-2">{{ pieza.estado }}</td>
-                        </tr>
-                        <tr v-if="piezasRecientes.length === 0">
-                            <td colspan="5" class="text-center py-4 text-gray-500">No hay piezas registradas aún.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
+                    <h3 class="text-xl font-semibold text-amber-900 mb-4">Resumen de Estado de Piezas</h3>
+                    
+                    <div v-if="totalPiezas > 0" class="relative w-48 h-48 rounded-full flex items-center justify-center overflow-hidden"
+                         :style="donutStyle">
+                        <div class="absolute w-32 h-32 bg-white rounded-full z-10"></div>
+                        <div class="absolute text-center text-amber-900 font-bold text-2xl z-20">
+                            {{ totalPiezas }}
+                            <span class="block text-sm font-normal text-gray-600">Total</span>
+                        </div>
+                    </div>
+                    <div v-else class="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-center">
+                        No hay piezas registradas.
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap justify-center gap-4 text-amber-800">
+                        <div class="flex items-center">
+                            <span class="w-4 h-4 rounded-full bg-[#2A9D8F] mr-2"></span>
+                            Fabricado ({{ fabricadoPorcentaje.toFixed(1) }}%)
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-4 h-4 rounded-full bg-[#E76F51] mr-2"></span>
+                            Pendiente ({{ pendientePorcentaje.toFixed(1) }}%)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 rounded-xl shadow-md overflow-hidden p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-amber-900">Últimas piezas registradas</h3>
+                        <a href="/piezas" class="text-amber-700 hover:text-amber-900 font-medium transition duration-150 ease-in-out">Ver todas las piezas &rarr;</a>
+                    </div>
+                    <table class="min-w-full text-sm text-amber-800">
+                        <thead class="bg-amber-100 text-left text-sm font-semibold text-amber-900">
+                            <tr>
+                                <th class="px-4 py-3 text-left rounded-tl-lg">#</th>
+                                <th class="px-4 py-3 text-left">Pieza</th>
+                                <th class="px-4 py-3 text-left">Proyecto</th>
+                                <th class="px-4 py-3 text-left">Bloque</th>
+                                <th class="px-4 py-3 text-left rounded-tr-lg">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr 
+                                v-for="(pieza, index) in piezasRecientes" 
+                                :key="pieza.id_pieza" 
+                                class="hover:bg-amber-100 border-b border-amber-100 last:border-b-0"
+                            >
+                                <td class="px-4 py-2">{{ index + 1 }}</td>
+                                <td class="px-4 py-2">{{ pieza.pieza }}</td>
+                                <td class="px-4 py-2">{{ pieza.proyecto?.nombre ?? 'Sin proyecto' }}</td>
+                                <td class="px-4 py-2">{{ pieza.bloque?.nombre_bloque ?? 'Sin bloque' }}</td>
+                                <td class="px-4 py-2">{{ pieza.estado }}</td>
+                            </tr>
+                            <tr v-if="piezasRecientes.length === 0">
+                                <td colspan="5" class="text-center py-4 text-gray-500">No hay piezas registradas aún.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
-

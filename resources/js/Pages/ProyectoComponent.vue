@@ -44,6 +44,10 @@ function saveProyecto() {
   }
 
   if (isEdit.value) {
+    // When editing, the original_id is used for the PUT request URL
+    // The id_proyecto in the form is what's being updated if the user changed it in the create modal
+    // However, if the ID field is hidden during edit, form.id_proyecto will retain its original value
+    // This is safe because original_id ensures the correct record is targeted.
     router.put(`/proyectos/${form.original_id}`, payload, {
       preserveScroll: true,
       onSuccess: () => (showModal.value = false)
@@ -68,7 +72,7 @@ function deleteProyecto(id) {
 
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+      <h2 class="font-semibold text-xl text-amber-900 leading-tight">
         Listado de Proyectos
       </h2>
     </template>
@@ -95,11 +99,12 @@ function deleteProyecto(id) {
           <tr
             v-for="(proyecto, index) in props.proyectos"
             :key="proyecto.id_proyecto"
-            class="text-sm"
+            class="text-sm hover:bg-amber-100 border-b border-amber-100 last:border-b-0"
+            
           >
-            <td class="px-4 py-2 border-b border-amber-100">{{ index + 1 }}</td>
-            <td class="px-4 py-2 border-b border-amber-100">{{ proyecto.nombre }}</td>
-            <td class="px-4 py-2 border-b border-amber-100">
+            <td class="px-4 py-2">{{ index + 1 }}</td>
+            <td class="px-4 py-2">{{ proyecto.nombre }}</td>
+            <td class="px-4 py-2">
               <div class="flex space-x-2">
                 <button
                   @click="openEditModal(proyecto)"
@@ -133,7 +138,7 @@ function deleteProyecto(id) {
       aria-modal="true"
     >
       <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 overflow-y-auto max-h-[90vh]">
-        <h3 class="text-lg font-semibold mb-4">
+        <h3 class="text-lg font-semibold mb-4 text-amber-900">
           {{ isEdit ? 'Editar Proyecto' : 'Agregar Proyecto' }}
         </h3>
         <form @submit.prevent="saveProyecto" class="space-y-4">
@@ -150,7 +155,7 @@ function deleteProyecto(id) {
             />
           </div>
 
-          <div>
+          <div v-if="!isEdit">
             <label class="block text-sm font-medium text-gray-700 mb-1">
               ID del Proyecto
             </label>
