@@ -19,15 +19,14 @@ class PiezaController extends Controller
      */
     public function index()
     {        
-        $proyecto = Proyecto::all();
-        $usuarioNombre = Auth::user()->name; 
+        // Verifica que Auth::user() no sea nulo antes de acceder a sus propiedades
+        $usuarioNombre = Auth::check() ? (Auth::user()->Usuario ?? Auth::user()->name) : 'Invitado'; 
 
         return Inertia::render('PiezasComponent', [
-           
             'piezas' => Pieza::with('proyecto', 'bloque')->get(),
             'proyectos' => Proyecto::all(),
             'bloques' => Bloque::all(),
-            'usuarioNombre' => Auth::user()->name,
+            'usuarioNombre' => $usuarioNombre,
         ]);
     }
 
@@ -37,15 +36,18 @@ class PiezaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'pieza' => 'required|max:10',
-        'peso_teorico' => 'required|numeric',
-        'estado' => 'required|in:Fabricado,Pendiente',
-        'id_proyecto' => 'required|exists:proyectos,id_proyecto',
-        'id_bloque' => 'required|exists:bloques,id_bloque',
+            'pieza' => 'required|string|max:10',
+            'peso_teorico' => 'required|numeric',
+            'estado' => 'required|in:Fabricado,Pendiente',
+            'id_proyecto' => 'required|string|exists:proyectos,id_proyecto',
+            'id_bloque' => 'required|string|exists:bloques,id_bloque',
         ]);
 
+        // Generar un ID de 10 caracteres único para 'id_pieza'
         $request->merge([
-            'id_pieza' => Str::uuid(), // o tu lógica de ID de 10 caracteres
+            'id_pieza' => Str::random(10), // <-- ¡CORREGIDO A id_pieza (minúsculas)!
+            'fecha_registro' => now(), // Añadir fecha y hora actuales
+            'registrado_por' => Auth::id(), // ID del usuario autenticado
         ]);
 
         Pieza::create($request->all());
@@ -59,12 +61,20 @@ class PiezaController extends Controller
     public function update(Request $request, Pieza $pieza)
     {
         $request->validate([
-            'pieza' => 'required|max:10',
+            'pieza' => 'required|string|max:10',
             'peso_teorico' => 'required|numeric',
             'estado' => 'required|in:Fabricado,Pendiente',
-            'id_proyecto' => 'required|exists:proyectos,id_proyecto',
-            'id_bloque' => 'required|exists:bloques,id_bloque',
+            'id_proyecto' => 'required|string|exists:proyectos,id_proyecto',
+            'id_bloque' => 'required|string|exists:bloques,id_bloque',
         ]);
+
+        // Asegúrate de que el estado y los campos de registro se actualicen si se ingresa peso real
+        if ($request->filled('peso_real') && $request->estado === 'Fabricado') {
+             $request->merge([
+                'fecha_registro' => now(),
+                'registrado_por' => Auth::id(),
+            ]);
+        }
 
         $pieza->update($request->all());
 

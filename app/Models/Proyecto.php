@@ -9,23 +9,36 @@ class Proyecto extends Model
 {
     use HasFactory;
 
-    // Nombre de la tabla asociada
     protected $table = 'proyectos';
-
-    // Clave primaria personalizada
-    protected $primaryKey = 'id_proyecto';
-
-    // Indicamos que no es autoincremental y es string
+    protected $primaryKey = 'id_proyecto'; // Correcto: id_proyecto
     public $incrementing = false;
     protected $keyType = 'string';
 
-    // Campos que pueden asignarse masivamente
-    protected $fillable = ['id_proyecto', 'nombre'];
+    protected $fillable = [
+        'id_proyecto',
+        'nombre', // Correcto: nombre (en minúsculas)
+    ];
 
-    // Relación con la tabla bloques
-   public function bloques()
+    /**
+     * Un proyecto tiene muchos bloques.
+     */
+    public function bloques()
     {
-    return $this->hasMany(Bloque::class, 'id_proyecto', 'id_proyecto');
+        return $this->hasMany(Bloque::class, 'id_proyecto', 'id_proyecto');
     }
 
+    /**
+     * Un proyecto tiene muchas piezas a través de los bloques.
+     */
+    public function piezas()
+    {
+        return $this->hasManyThrough(
+            Pieza::class,   // Modelo final (Pieza)
+            Bloque::class,  // Modelo intermedio (Bloque)
+            'id_proyecto',  // Clave foránea en la tabla `bloques` que referencia a `proyectos`
+            'id_bloque',    // Clave foránea en la tabla `piezas` que referencia a `bloques`
+            'id_proyecto',  // Clave local en `proyectos`
+            'id_bloque'     // Clave local en `bloques`
+        );
+    }
 }

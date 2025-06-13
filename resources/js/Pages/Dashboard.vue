@@ -1,38 +1,29 @@
 <script setup>
-import { computed } from 'vue' // Importa 'computed' para propiedades reactivas
+import { computed } from 'vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, usePage } from '@inertiajs/vue3'
+import { Head, usePage } from '@inertiajs/vue3' // Eliminado Link si ya no se usa, o mantenido si hay otros Links. Por ahora, lo dejaré.
 
-// Obtenemos las props enviadas desde el controlador
 const { props } = usePage()
 
-const resumen = props.resumen
-const piezasRecientes = props.piezasRecientes
+const resumen = computed(() => props.resumen ?? {});
+const piezasRecientes = computed(() => props.piezasRecientes ?? []);
 
-// Calcular los totales y porcentajes para la gráfica de dona CSS
-const totalPiezas = computed(() => (resumen.piezas_fabricadas ?? 0) + (resumen.piezas_pendientes ?? 0));
+const totalPiezas = computed(() => (resumen.value.piezas_fabricadas ?? 0) + (resumen.value.piezas_pendientes ?? 0));
 
 const fabricadoPorcentaje = computed(() => {
     if (totalPiezas.value === 0) return 0;
-    return ((resumen.piezas_fabricadas ?? 0) / totalPiezas.value) * 100;
+    return ((resumen.value.piezas_fabricadas ?? 0) / totalPiezas.value) * 100;
 });
 
 const pendientePorcentaje = computed(() => {
-    // Si el total es 0, o si fabricadoPorcentaje ya es 100 (y total es 0), el pendiente es 0
     if (totalPiezas.value === 0) return 0;
-    // O puedes simplemente calcularlo como 100 - fabricadoPorcentaje para evitar posibles imprecisiones de coma flotante
-    return 100 - fabricadoPorcentaje.value; 
-    // return ((resumen.piezas_pendientes ?? 0) / totalPiezas.value) * 100; // Otra opción
+    return 100 - fabricadoPorcentaje.value;
 });
 
-// Generar el estilo de background para la gráfica de dona CSS usando conic-gradient
 const donutStyle = computed(() => {
-    // Define los colores usando una paleta que combine con ámbar pero sea distintiva para la gráfica
-    // Un verde para "Fabricado" y un naranja/rojo para "Pendiente"
-    const colorFabricado = '#2A9D8F'; // Un verde oscuro que contrasta
-    const colorPendiente = '#E76F51'; // Un naranja-rojizo que resalta el "pendiente"
+    const colorFabricado = '#2A9D8F';
+    const colorPendiente = '#E76F51';
 
-    // Calcula el punto de parada del gradiente para el porcentaje fabricado
     const fabricadoStop = fabricadoPorcentaje.value;
 
     return {
@@ -79,9 +70,9 @@ const donutStyle = computed(() => {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
                     <h3 class="text-xl font-semibold text-amber-900 mb-4">Resumen de Estado de Piezas</h3>
-                    
+
                     <div v-if="totalPiezas > 0" class="relative w-48 h-48 rounded-full flex items-center justify-center overflow-hidden"
-                         :style="donutStyle">
+                            :style="donutStyle">
                         <div class="absolute w-32 h-32 bg-white rounded-full z-10"></div>
                         <div class="absolute text-center text-amber-900 font-bold text-2xl z-20">
                             {{ totalPiezas }}
@@ -102,6 +93,18 @@ const donutStyle = computed(() => {
                             Pendiente ({{ pendientePorcentaje.toFixed(1) }}%)
                         </div>
                     </div>
+
+                    <div class="mt-8"> <a :href="$route('reportes.piezas_por_proyecto')"
+                           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out inline-flex items-center"
+                           target="_blank"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-9.293a1 1 0 011.414 0L10 10.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v7a1 1 0 11-2 0V3a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                            Exportar Reporte
+                        </a>
+                    </div>
                 </div>
 
                 <div class="bg-amber-50 rounded-xl shadow-md overflow-hidden p-6">
@@ -120,9 +123,9 @@ const donutStyle = computed(() => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr 
-                                v-for="(pieza, index) in piezasRecientes" 
-                                :key="pieza.id_pieza" 
+                            <tr
+                                v-for="(pieza, index) in piezasRecientes"
+                                :key="pieza.id_pieza"
                                 class="hover:bg-amber-100 border-b border-amber-100 last:border-b-0"
                             >
                                 <td class="px-4 py-2">{{ index + 1 }}</td>

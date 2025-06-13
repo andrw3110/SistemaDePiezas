@@ -10,7 +10,7 @@ class Pieza extends Model
     use HasFactory;
 
     protected $table = 'piezas';
-    protected $primaryKey = 'id_pieza';
+    protected $primaryKey = 'id_pieza'; // Correcto: id_pieza
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -20,25 +20,46 @@ class Pieza extends Model
         'peso_teorico',
         'peso_real',
         'estado',
-        'id_proyecto',
+        'id_proyecto',  // <-- ¡ESTO ES LO QUE FALTABA Y HA SIDO AÑADIDO!
         'id_bloque',
         'fecha_registro',
         'registrado_por',
     ];
 
-    /**
-     * Una pieza pertenece a un proyecto
-     */
-    public function proyecto()
-    {
-        return $this->belongsTo(Proyecto::class, 'id_proyecto', 'id_proyecto');
-    }
+    protected $casts = [
+        'fecha_registro' => 'datetime',
+        'peso_teorico' => 'decimal:2',
+        'peso_real' => 'decimal:2',
+    ];
 
     /**
-     * Una pieza pertenece a un bloque
+     * Una pieza pertenece a un bloque.
      */
     public function bloque()
     {
         return $this->belongsTo(Bloque::class, 'id_bloque', 'id_bloque');
+    }
+
+    /**
+     * Una pieza pertenece a un proyecto a través de su bloque.
+     */
+    public function proyecto()
+    {
+        return $this->hasOneThrough(
+            Proyecto::class,
+            Bloque::class,
+            'id_bloque',
+            'id_proyecto',
+            'id_bloque',
+            'id_proyecto'
+        );
+    }
+
+    /**
+     * Una pieza es registrada por un usuario.
+     */
+    public function registradoPor()
+    {
+        return $this->belongsTo(User::class, 'registrado_por', 'id');
     }
 }

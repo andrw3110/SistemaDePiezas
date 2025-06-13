@@ -1,5 +1,4 @@
 <script setup>
-// Importación de funcionalidades de Vue y componentes reutilizables
 import { ref } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
@@ -7,64 +6,57 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
-// Variable reactiva para controlar el estado del menú en dispositivos móviles
 const showingNavigationDropdown = ref(false);
 </script>
 
 <template>
   <div>
     <div class="min-h-screen bg-gray-100">
-      <!-- Barra de navegación superior -->
       <nav class="bg-white border-b border-blue-400">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
-            
-            <!-- Sección izquierda: Logo y enlaces -->
+
             <div class="flex">
-              <!-- Logo de la aplicación -->
               <div class="shrink-0 flex items-center">
-                <a :href="route('dashboard')">
+                <a :href="$route('dashboard')">
                   <ApplicationLogo class="block h-12 w-auto fill-current text-blue-600" />
                 </a>
               </div>
 
-              <!-- Enlaces de navegación visibles en pantallas grandes -->
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                <NavLink :href="$route('dashboard')" :active="$route().current('dashboard')">
                   Dashboard
                 </NavLink>
               </div>
 
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('proyectos.index')" :active="route().current('proyectos.index')">
+                <NavLink :href="$route('proyectos.index')" :active="$route().current('proyectos.index')">
                   Proyectos
                 </NavLink>
               </div>
 
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('bloques.index')" :active="route().current('bloques.index')">
+                <NavLink :href="$route('bloques.index')" :active="$route().current('bloques.index')">
                   Bloques
                 </NavLink>
               </div>
 
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('registros.index')" :active="route().current('registros.index')">
+                <NavLink :href="$route('registros.index')" :active="$route().current('registros.index')">
                   Registros
                 </NavLink>
               </div>
 
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('piezas.index')" :active="route().current('piezas.index')">
+                <NavLink :href="$route('piezas.index')" :active="$route().current('piezas.index')">
                   Piezas
                 </NavLink>
               </div>
             </div>
 
-            <!-- Menú desplegable de usuario en pantallas grandes -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
               <div class="ms-3 relative">
                 <Dropdown align="right" width="48">
-                  <!-- Botón que activa el menú del usuario -->
                   <template #trigger>
                     <span class="inline-flex rounded-md">
                       <button
@@ -72,7 +64,6 @@ const showingNavigationDropdown = ref(false);
                         class="btn btn-light text-secondary d-inline-flex align-items-center px-3 py-2 rounded"
                       >
                         {{ $page.props.auth.user.name }}
-                        <!-- Flecha hacia abajo -->
                         <svg class="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                           <path
                             fill-rule="evenodd"
@@ -84,10 +75,9 @@ const showingNavigationDropdown = ref(false);
                     </span>
                   </template>
 
-                  <!-- Opciones del menú del usuario -->
                   <template #content>
-                    <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
-                    <DropdownLink :href="route('logout')" method="post" as="button">
+                    <DropdownLink :href="$route('profile.edit')"> Profile </DropdownLink>
+                    <DropdownLink :href="$route('logout')" method="post" as="button">
                       Log Out
                     </DropdownLink>
                   </template>
@@ -95,14 +85,12 @@ const showingNavigationDropdown = ref(false);
               </div>
             </div>
 
-            <!-- Botón tipo "hamburguesa" para pantallas pequeñas -->
             <div class="-me-2 flex items-center sm:hidden">
               <button
                 @click="showingNavigationDropdown = !showingNavigationDropdown"
                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
               >
                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                  <!-- Ícono de menú (hamburguesa) -->
                   <path
                     :class="{
                       hidden: showingNavigationDropdown,
@@ -113,7 +101,6 @@ const showingNavigationDropdown = ref(false);
                     stroke-width="2"
                     d="M4 6h16M4 12h16M4 18h16"
                   />
-                  <!-- Ícono de cerrar (X) -->
                   <path
                     :class="{
                       hidden: !showingNavigationDropdown,
@@ -130,44 +117,38 @@ const showingNavigationDropdown = ref(false);
           </div>
         </div>
 
-        <!-- Menú desplegable para pantallas pequeñas -->
         <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden">
-          <!-- Enlaces de navegación -->
           <div class="pt-2 pb-3 space-y-1">
-            <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+            <ResponsiveNavLink :href="$route('dashboard')" :active="$route().current('dashboard')">
               Dashboard
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('proyectos.index')" :active="route().current('proyectos.index')">
+            <ResponsiveNavLink :href="$route('proyectos.index')" :active="$route().current('proyectos.index')">
               Proyectos
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('bloques.index')" :active="route().current('bloques.index')">
+            <ResponsiveNavLink :href="$route('bloques.index')" :active="$route().current('bloques.index')">
               Bloques
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('registros.index')" :active="route().current('registros.index')">
+            <ResponsiveNavLink :href="$route('registros.index')" :active="$route().current('registros.index')">
               Registros
             </ResponsiveNavLink>
-            <ResponsiveNavLink :href="route('piezas.index')" :active="route().current('piezas.index')">
+            <ResponsiveNavLink :href="$route('piezas.index')" :active="$route().current('piezas.index')">
               Piezas
             </ResponsiveNavLink>
           </div>
 
-          <!-- Información del usuario y opciones -->
           <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-              <!-- Nombre del usuario -->
               <div class="font-medium text-base text-gray-800">
                 {{ $page.props.auth.user.name }}
               </div>
-              <!-- Correo electrónico del usuario -->
               <div class="font-medium text-sm text-gray-500">
                 {{ $page.props.auth.user.email }}
               </div>
             </div>
 
-            <!-- Enlaces del perfil -->
             <div class="mt-3 space-y-1">
-              <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
-              <ResponsiveNavLink :href="route('logout')" method="post" as="button">
+              <ResponsiveNavLink :href="$route('profile.edit')"> Profile </ResponsiveNavLink>
+              <ResponsiveNavLink :href="$route('logout')" method="post" as="button">
                 Log Out
               </ResponsiveNavLink>
             </div>
@@ -175,14 +156,12 @@ const showingNavigationDropdown = ref(false);
         </div>
       </nav>
 
-      <!-- Cabecera de la página (opcional si se define desde el componente padre) -->
       <header class="bg-white shadow" v-if="$slots.header">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <slot name="header" />
         </div>
       </header>
 
-      <!-- Contenido principal de la página -->
       <main>
         <slot />
       </main>
